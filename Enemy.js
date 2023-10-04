@@ -35,7 +35,7 @@ class Enemy extends Sprite {
 
 class Devil extends Enemy {
     constructor(pos) {
-        super(images.devil, pos, 200, 0.3);
+        super(images.devil, pos, 200, 0.2);
     }
 
     update() {
@@ -48,16 +48,16 @@ class Devil extends Enemy {
 
 class Ghost extends Enemy {
     constructor(pos) {
-        super(images.ghost, pos, 50, 0.3);
+        super(images.ghost, pos, 50, 0.2);
         this.phase = Math.random() * Math.PI;
     }
 
     update() {
-        this.phase += 0.03;
+        this.phase += 0.01;
         if (this.pos.dist(player.pos) > 50) {
-            this.velTo(player.pos, 3);
+            this.velTo(player.pos, 5);
         }
-        this.vel = this.vel.add(Vec.thetaR(this.phase, 5));
+        this.vel = this.vel.add(Vec.thetaR(this.phase, 7));
         this.hflip = this.vel.x > 0;
         super.update();
     }

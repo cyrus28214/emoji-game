@@ -31,15 +31,21 @@ class Player extends Sprite {
 
 class MouseInput {
     constructor(){
-        this.pos = SIZE.div(2);
-        document.addEventListener("mousemove", this.update.bind(this));
+        this.pos = Vec.zero();
+        this.mpos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
+        document.addEventListener("mousemove", this.mouseMove.bind(this));
     }
 
-    update(event) {
+    update() {
         let rect = canvas.getBoundingClientRect();
-        this.pos.x = (event.clientX - rect.left) * (canvas.width / rect.width);
-        this.pos.y = (event.clientY - rect.top) * (canvas.height / rect.height);
+        this.pos.x = (this.mpos.x - rect.left) * (canvas.width / rect.width);
+        this.pos.y = (this.mpos.y - rect.top) * (canvas.height / rect.height);
         this.pos = this.pos.sub(SIZE.div(2)).add(player.pos);
+    }
+
+    mouseMove(event) {
+        this.mpos.x = event.clientX;
+        this.mpos.y = event.clientY;
     }
 }
 

@@ -2,12 +2,13 @@ import {Vec} from "./Sprite.js";
 import {randomWeight} from "./utilities.js";
 import {Devil, Ghost} from "./Enemy.js";
 import {ctx, SIZE, player, mouseInput} from "./global.js";
+import { GoundDecManager } from "./GoundDec.js";
 
 class EnemyManager {
     constructor() {
         this.enemies = [];
         this.enemyTypes = [Devil, Ghost];
-        this.weights = [7, 3];
+        this.weights = [6, 4];
         this.last_spawn_time = Date.now();
     }
 
@@ -32,11 +33,11 @@ class EnemyManager {
     }
 
     update() {
-        if (Date.now() - this.last_spawn_time > 2000) {
+        if (Date.now() - this.last_spawn_time > 1000) {
             this.spawn();
             this.last_spawn_time = Date.now();
         }
-        for (let i = 1; i < this.enemies.length; ++i) {
+        for (let i = 0; i < this.enemies.length; ++i) {
             const enemy = this.enemies[i];
             if (enemy.dead) {
                 this.enemies.splice(i, 1);
@@ -68,13 +69,16 @@ class RenderList {
 }
 
 let enemyManager = new EnemyManager();
+let goundDecManager = new GoundDecManager();
 let renderList = new RenderList();
 
 
 function gameLoop() {
+    mouseInput.update();
     enemyManager.update();
+    goundDecManager.update();
     player.update();
-    renderList.update(enemyManager.enemies.concat([player]));
+    renderList.update(enemyManager.enemies.concat(goundDecManager.entities).concat([player]));
 
     ctx.resetTransform();
     ctx.clearRect(0, 0, ...SIZE.arr());

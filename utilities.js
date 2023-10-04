@@ -23,4 +23,10 @@ function randomWeight(arr) {
     return arr.length - 1;
 }
 
-export {lastElement, arrSum, randomWeight};
+function doTimes(func, times) {
+    for (let i = 0; i < times; ++i){
+        func();
+    }
+}
+
+export {lastElement, arrSum, randomWeight, doTimes};
