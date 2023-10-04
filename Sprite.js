@@ -102,10 +102,9 @@ class Rect {
 }
 
 class Sprite extends Rect{
-    constructor(img_path, pos, size, pivot) {
+    constructor(img, pos, size, pivot) {
         super(pos, size, pivot || new Vec(0.5, 0.5));
-        this.image = document.createElement("img");
-        this.image.src = img_path;
+        this.image = img;
         this.hflip = false;
         this.vel = new Vec(0, 0);
     }
