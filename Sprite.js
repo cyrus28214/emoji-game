@@ -40,16 +40,40 @@ class Vec {
     divV(vec) {
         return new Vec(this.x / vec.x, this.y / vec.y);
     }
+
+    dist(vec) {
+        return this.sub(vec).length();
+    }
+
+    in(rect) {
+        return this.x >= rect.left() &&
+            this.x <= rect.right() &&
+            this.y >= rect.top() &&
+            this.y <= rect.bottom();
+    }
 }
 
 class Rect {
-    constructor(x, y, w, h) {
-        this.pos = new Vec(x, y);
-        this.size = new Vec(w, h);
+    constructor(pos, size, pivot) {
+        this.pos = pos;
+        this.size = size;
+        this.pivot = pivot || new Vec(0, 0);
     }
 
-    arr() {
-        return [this.x, this.y, this.w, this.h];
+    left() {
+        return this.pos.x - this.size.x * this.pivot.x;
+    }
+
+    right() {
+        return this.pos.x + this.size.x * (1 - this.pivot.x);
+    }
+
+    top() {
+        return this.pos.y - this.size.y * this.pivot.y;
+    }
+
+    bottom() {
+        return this.pos.y + this.size.y * (1 - this.pivot.y);
     }
 
     move(vec) {
@@ -59,24 +83,25 @@ class Rect {
     moveTo(target, step) {
         this.move(target.sub(this.pos).normalized().mul(step));
     }
+
+    render(ctx) {
+        this.fillRect(this.left(), this.top(), ...this.size.arr());
+    }
 }
 
 class Sprite extends Rect{
-    constructor(img_path, x, y, w, h, p_x, p_y) {
-        super(x, y, w, h);
+    constructor(img_path, pos, size, pivot) {
+        super(pos, size, pivot || new Vec(0.5, 0.5));
         this.image = document.createElement("img");
         this.image.src = img_path;
-        if(p_x !== undefined && p_y !== undefined) {
-            this.pivot = new Vec(p_x, p_y);
-        }
-        else {
-            this.pivot = new Vec(0.5, 0.5);
-        }
     }
 
     render(ctx) {
         if (!this.image.complete) return;
-        ctx.drawImage(this.image, ...this.pos.sub(this.size.mulV(this.pivot)).arr(), ...this.size.arr());
+        ctx.drawImage(this.image, 
+            this.left(),
+            this.top(),
+            ...this.size.arr());
     }
 } 
 
