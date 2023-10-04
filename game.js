@@ -1,57 +1,92 @@
 import {Vec, Rect, Sprite} from "./Sprite.js";
-import { lastElement, thetaR} from "./ultilities.js";
+import {lastElement} from "./utilities.js";
 
 let canvas;
 let ctx;
 
-const SIZE = new Vec(1600, 1200);
+const SIZE = new Vec(900, 1600);
 const RECT = new Rect(new Vec(0, 0), SIZE);
 
 class Player extends Sprite {
     constructor() {
-        super("./images/turtle.png", SIZE.div(2), new Vec(200, 200));
-        this.max_health = 100;
-        this.health = this.max_health;
+        super("./images/turtle.png", new Vec(0, 0), new Vec(100, 100));
+        this.max_hp = 100;
+        this.hp = this.max_hp;
     }
 
     update() {
-        if (this.pos.dist(mouseInput.pos) > 50) {
-            this.moveTo(mouseInput.pos, 7);
+        let mpos = mouseInput.pos;
+        if (this.pos.dist(mpos) > 50) {
+            this.velTo(mpos, 3);
         }
-        this.render(ctx);
+        this.hflip = mpos.x > this.pos.x;
+        super.update();
+        this.vel = Vec.zero();
+    }
+
+    render() {
+        super.render(ctx);
+    }
+    
+}
+
+class Enemy extends Sprite {
+    constructor(img_path, pos, max_hp, self_dam) {
+        super(img_path, pos, new Vec(100, 100));
+        this.max_hp = max_hp;
+        this.hp = this.max_hp;
+        this.self_dam = self_dam;
+        this.dead = false;
+    }
+
+    update() {
+        this.hp -= this.self_dam;
+        if (this.hp <= 0) {
+            this.dead = true;
+            this.die();
+        }
+        super.update();
+        this.vel = Vec.zero();
+    }
+
+    render() {
+        ctx.globalAlpha = this.hp / this.max_hp * 0.7 + 0.3;
+        super.render(ctx);
+        ctx.globalAlpha = 1.0;
+    }
+
+    die() {
+
     }
 }
 
-class Devil extends Sprite {
+class Devil extends Enemy {
     constructor(pos) {
-        super("./images/devil.png", pos, new Vec(200, 200));
-        this.max_health = 200;
-        this.health = this.max_health;
+        super("./images/devil.png", pos, 200, 0.3);
     }
 
     update() {
         if (this.pos.dist(player.pos) > 50) {
-            this.moveTo(player.pos, 1);
+            this.velTo(player.pos, 2);
         }
-        this.render(ctx);
+        super.update();
     }
 }
 
-class Ghost extends Sprite {
+class Ghost extends Enemy {
     constructor(pos) {
-        super("./images/ghost.png", pos, new Vec(200, 200));
-        this.max_health = 50;
-        this.health = this.max_health;
+        super("./images/ghost.png", pos, 50, 0.3);
         this.phase = Math.random() * Math.PI;
     }
 
     update() {
-        this.phase += 0.01;
+        this.phase += 0.03;
         if (this.pos.dist(player.pos) > 50) {
-            this.moveTo(player.pos, 3);
-            this.move(thetaR(this.phase, 5));
+            this.velTo(player.pos, 3);
         }
-        this.render(ctx);
+        this.vel = this.vel.add(Vec.thetaR(this.phase, 5));
+        this.hflip = this.vel.x > 0;
+        super.update();
     }
 }
 
@@ -96,8 +131,20 @@ class EnemyManager {
             this.spawn();
             this.last_spawn_time = Date.now();
         }
+        for (let i = 1; i < this.enemies.length; ++i) {
+            const enemy = this.enemies[i];
+            if (enemy.dead) {
+                this.enemies.splice(i, 1);
+            }
+            else {
+                enemy.update();
+            }
+        }
+    }
+
+    render() {
         for (const enemy of this.enemies) {
-            enemy.update();
+            enemy.render();
         }
     }
 }
@@ -112,6 +159,7 @@ class MouseInput {
         let rect = canvas.getBoundingClientRect();
         this.pos.x = (event.clientX - rect.left) * (canvas.width / rect.width);
         this.pos.y = (event.clientY - rect.top) * (canvas.height / rect.height);
+        this.pos = this.pos.sub(SIZE.div(2)).add(player.pos);
     }
 }
 
@@ -140,13 +188,21 @@ function main() {
     resetDisplay();
     window.addEventListener("resize", resetDisplay);
     ctx = canvas.getContext("2d");
+    console.log(ctx);
     gameLoop();
 }
 
 function gameLoop() {
-    ctx.clearRect(0, 0, ...SIZE.arr());
     enemyManager.update();
     player.update();
+
+    ctx.resetTransform();
+    ctx.clearRect(0, 0, ...SIZE.arr());
+    ctx.translate(...player.pos.oppo().add(SIZE.div(2)).arr());
+
+    enemyManager.render();
+    player.render();
+    
     requestAnimationFrame(gameLoop);
 }
 
@@ -154,5 +210,6 @@ document.addEventListener("DOMContentLoaded", main);
 
 console.log(player);
 console.log(mouseInput);
+
 
 

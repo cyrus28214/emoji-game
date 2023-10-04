@@ -4,12 +4,28 @@ class Vec {
         this.y = y;
     }
 
-    length() {
+    static thetaR(theta, r) {
+        return new Vec(Math.cos(theta) * r, Math.sin(theta) * r);
+    }
+
+    static pointsR(v1, v2, r) {
+        return new Vec(v2.x - v1.x, v2.y - v1.y).nor().mul(r);
+    }
+
+    static fromTo(v1, v2) {
+        return v2.sub(v1);
+    }
+
+    static zero() {
+        return new Vec(0, 0);
+    }
+
+    len() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
-    normalized() {
-        let len = this.length();
+    nor() {
+        let len = this.len();
         return this.div(len);
     }
 
@@ -42,7 +58,7 @@ class Vec {
     }
 
     dist(vec) {
-        return this.sub(vec).length();
+        return this.sub(vec).len();
     }
 
     in(rect) {
@@ -50,6 +66,10 @@ class Vec {
             this.x <= rect.right() &&
             this.y >= rect.top() &&
             this.y <= rect.bottom();
+    }
+    
+    oppo() {
+        return new Vec(-this.x, -this.y);
     }
 }
 
@@ -79,14 +99,6 @@ class Rect {
     move(vec) {
         this.pos = this.pos.add(vec);
     }
-
-    moveTo(target, step) {
-        this.move(target.sub(this.pos).normalized().mul(step));
-    }
-
-    render(ctx) {
-        this.fillRect(this.left(), this.top(), ...this.size.arr());
-    }
 }
 
 class Sprite extends Rect{
@@ -94,14 +106,27 @@ class Sprite extends Rect{
         super(pos, size, pivot || new Vec(0.5, 0.5));
         this.image = document.createElement("img");
         this.image.src = img_path;
+        this.hflip = false;
+        this.vel = new Vec(0, 0);
+    }
+
+    velTo(targetPos, step) {
+        this.vel = this.vel.add(Vec.pointsR(this.pos, targetPos, step));
+    }
+    
+    update() {
+        this.move(this.vel);
     }
 
     render(ctx) {
         if (!this.image.complete) return;
-        ctx.drawImage(this.image, 
-            this.left(),
-            this.top(),
-            ...this.size.arr());
+        ctx.save();
+        ctx.translate(this.pos.x, this.pos.y);
+        if (this.hflip) {
+            ctx.scale(-1, 1);
+        }
+        ctx.drawImage(this.image, -this.size.x * this.pivot.x, -this.size.y * this.pivot.y, ...this.size.arr());
+        ctx.restore();
     }
 } 
 
