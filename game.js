@@ -40,10 +40,26 @@ class Player {
 
 let player = new Player();
 
+function resetDisplay() {
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    let aspect_ratio = WIDTH / HEIGHT;
+    if (w / h > aspect_ratio) {
+        canvas.style.height = h + "px";
+        canvas.style.width = h * aspect_ratio+ "px";
+    }
+    else {
+        canvas.style.width = w+ "px";
+        canvas.style.height = w / aspect_ratio+ "px";
+    }
+}
+
 function main() {
     canvas = document.getElementById("canvas");
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
+    resetDisplay();
+    window.addEventListener("resize", resetDisplay);
     ctx = canvas.getContext("2d");
     gameLoop();
 }
@@ -53,7 +69,6 @@ function gameLoop() {
     player.update();
     requestAnimationFrame(gameLoop);
 }
-
 
 document.addEventListener("DOMContentLoaded", main);
 
