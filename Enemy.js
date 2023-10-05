@@ -34,7 +34,7 @@ class Enemy extends Sprite {
     }
 
     attack(entity){
-        if (entity.effect.type === "diamond") return;
+        if (entity.effect.type === "diamond" || entity.dead) return;
         entity.hp -= this.dmg;
         this.die();
     }
@@ -46,7 +46,7 @@ class Devil extends Enemy {
             image: images.devil,
             max_hp: 200,
             self_dmg: 0.3,
-            dmg: 7,
+            dmg: 27,
         });
         this.hp = this.max_hp;
         Object.assign(this, paras);
@@ -69,7 +69,7 @@ class Ghost extends Enemy {
             dead: false,
             phase: Math.random() * Math.PI,
             dphase: Math.random() * 0.02 - 0.01,
-            dmg: 3
+            dmg: 13
         });
         this.hp = this.max_hp;
         Object.assign(this, paras);

@@ -11,7 +11,7 @@ const RECT = new Rect(new Vec(0, 0), SIZE);
 class Player extends Sprite {
     constructor() {
         super({
-            follow: true,
+            movable: true,
             image: images.turtle,
             pos: new Vec(0, 0),
             size: new Vec(100, 100),
@@ -23,6 +23,15 @@ class Player extends Sprite {
     }
 
     update() {
+        if (this.hp <= 0) {
+            this.dead = true;
+        }
+
+        if (this.dead) {
+            this.image = images.turtle_die;
+            return;
+        }
+
         if (this.effect.time === 0) {
             this.effect = Effect.Null();
         }
@@ -36,7 +45,7 @@ class Player extends Sprite {
             this.image = images.turtle;
         }
 
-        if (this.follow) {
+        if (this.movable) {
             let mpos = mouseInput.pos;
             if (this.pos.dist(mpos) > 50) {
                 this.velTo(mpos, 3);
@@ -45,6 +54,14 @@ class Player extends Sprite {
             super.update();
             this.vel = Vec.zero();
         }
+    }
+
+    noMove() {
+        this.movable = false;
+    }
+
+    startMove() {
+        this.movable = ! this.dead;
     }
 
     render() {
@@ -75,13 +92,12 @@ class MouseInput {
     }
 
     touchEnd(event) {
-        player.follow = false;
+        player.noMove();
         event.cancelable && event.preventDefault();
-        this.mpos = new Vec(window.innerWidth / 2 - 100, window.innerHeight / 2);
     }
 
     touchStart(event) {
-        player.follow = true;
+        player.startMove();
         event.cancelable && event.preventDefault();
         this.mpos.x = event.touches[0].clientX;
         this.mpos.y = event.touches[0].clientY;
