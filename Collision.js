@@ -1,8 +1,14 @@
+import { Vec } from "./Sprite.js";
+
 class CollisionEvent {
     constructor(paras) {
         Object.assign(this, {
             del_tag: false
         }, paras);
+    }
+
+    del() {
+        this.del_tag = true;
     }
 }
 
@@ -15,10 +21,6 @@ class ColCC extends CollisionEvent{
         if (this.e1.pos.dist(this.e2.pos) <= this.e1.radius + this.e2.radius) {
             this.callback(this);
         }
-    }
-
-    del() {
-        this.del_tag = true;
     }
 }
 
@@ -36,15 +38,18 @@ class CollisionSystem {
     }
 
     update() {
-        for (let i = 0; i < this.cols.length; ++i) {
-            const event = this.cols[i];
-            if (event.del_tag) {
-                this.cols.splice(i, 1);
+        this.cols = this.cols.filter(i => {return !(i.del_tag || i.e1.del_tag || i.e2.del_tag);});
+        this.cols.forEach(i => {i.update();});
+    }
+
+    repel(trees, es) {
+        for (const e of es) {
+            for (const tree of trees) {
+                if (tree.pos.dist(e.pos) < tree.radius + e.radius) {
+                    e.pos = tree.pos.add(Vec.pointsR(tree.pos, e.pos, tree.radius + e.radius));
+                }
             }
-            else {
-                event.update();
-            }
-        }  
+        }
     }
 }
 

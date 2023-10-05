@@ -1,3 +1,5 @@
+import { renderSystem } from "./RenderSystem.js";
+
 class Vec {
     constructor(x, y) {
         this.x = x;
@@ -106,7 +108,8 @@ class Sprite extends Rect{
             hide: false,
             hflip: false,
             vel: Vec.zero(),
-            pivot: new Vec(0.5, 1)
+            pivot: new Vec(0.5, 1),
+            del_tag: false
         });
         Object.assign(this, paras);
     }
@@ -128,6 +131,10 @@ class Sprite extends Rect{
         }
         ctx.drawImage(this.image, -this.size.x * this.pivot.x, -this.size.y * this.pivot.y, ...this.size.arr());
         ctx.restore();
+    }
+
+    del() {
+        this.del_tag = true;
     }
 } 
 

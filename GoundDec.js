@@ -2,11 +2,18 @@ import {Sprite, Vec} from "./Sprite.js"
 import {images} from "./ImageLoader.js"
 import {SIZE, player} from "./global.js";
 import {randomWeight, doTimes} from "./utilities.js";
+import { renderSystem } from "./RenderSystem.js";
+
+let tree_list = [];
 
 class GroudDec extends Sprite {
     constructor(paras) {
         super();
         Object.assign(this, paras);
+    }
+
+    update(){
+
     }
 }
 
@@ -14,9 +21,11 @@ class Tree extends GroudDec {
     constructor(paras) {
         super({
             image: images.tree,
-            size: new Vec(200, 200)
+            size: new Vec(200, 200),
+            radius: 20,
         });
         Object.assign(this, paras);
+        tree_list.push(this);
     }
 }
 
@@ -57,6 +66,7 @@ class GoundDecManager {
         let new_dec = new type({
             pos: this.randomPos()
         });
+        renderSystem.add(new_dec);
         this.entities.push(new_dec);
         return new_dec;
     }
@@ -72,9 +82,10 @@ class GoundDecManager {
             dec.pos.x = chooseNearest(a, x, a + w);
             dec.pos.y = chooseNearest(b, y, b + h);
         }
+        this.entities.forEach((i) => {i.update()});
     }
 }
 
 let goundDecManager = new GoundDecManager();
 
-export {goundDecManager};
+export {goundDecManager, tree_list};

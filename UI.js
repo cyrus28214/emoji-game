@@ -1,6 +1,6 @@
 import { images } from "./ImageLoader.js";
 import { Sprite, Vec } from "./Sprite.js";
-import { SIZE } from "./global.js";
+import { SIZE, mouseInput, player } from "./global.js";
 
 class Heart extends Sprite{
     constructor(paras) {
@@ -79,4 +79,33 @@ class ScoreBoard {
     }
 }
 
-export {HpBar, ScoreBoard};
+class RestartButton extends Sprite{
+    constructor(paras) {
+        super({
+            pos: new Vec(SIZE.x / 2, SIZE.y / 3 * 2),
+            pivot: new Vec(0.5, 0.5),
+            size: new Vec(250, 250),
+            image: images.tick
+        });
+        Object.assign(this, paras);
+        document.addEventListener("click", this.click.bind(this));
+        document.addEventListener("touchend", this.click.bind(this));
+    }
+
+    update() {
+        if (mouseInput.pos.in(this)) {
+            this.size = new Vec(300, 300);
+        }
+        else {
+            this.size = new Vec(250, 250);
+        }
+    }
+
+    click() {
+        if (mouseInput.pos.in(this) && player.dead) {
+            location.reload();
+        }
+    }
+}
+
+export {HpBar, ScoreBoard, RestartButton};

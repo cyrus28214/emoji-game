@@ -21,6 +21,7 @@ let images = {
     apple\
     turtle_delicious\
     heart_heal\
+    tick\
     ; do echo $i: "load(\"./images/$i.png\"),"; done;
     */
     devil: load("./images/devil.png"),
@@ -37,6 +38,7 @@ let images = {
     apple: load("./images/apple.png"),
     turtle_delicious: load("./images/turtle_delicious.png"),
     heart_heal: load("./images/heart_heal.png"),
+    tick: load("./images/tick.png"),
 }
 
 

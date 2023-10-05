@@ -29,4 +29,14 @@ function doTimes(func, times) {
     }
 }
 
-export {lastElement, arrSum, randomWeight, doTimes};
+function delIfTagged(arr) {
+    for (let i = 0; i < arr.length; ++i) {
+        if (arr[i].del_tag) {
+            arr.splice(i, 1);
+            --i
+        }
+    }
+    return arr;
+}
+
+export {lastElement, arrSum, randomWeight, doTimes, delIfTagged};

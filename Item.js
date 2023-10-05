@@ -1,8 +1,9 @@
 import { Vec, Sprite } from "./Sprite.js";
-import { randomWeight } from "./utilities.js";
+import { delIfTagged, randomWeight } from "./utilities.js";
 import { player } from "./global.js";
 import { images } from "./ImageLoader.js";
 import { ColCC, collisionSystem } from "./Collision.js";
+import { renderSystem } from "./RenderSystem.js";
 
 //
 class Effect {
@@ -23,7 +24,6 @@ class Effect {
 class Item extends Sprite {
     constructor(paras) {
         super({
-            delete_tag: false,
             time: 300, 
             blink_time: 60,
             size: new Vec(50, 50),
@@ -36,7 +36,7 @@ class Item extends Sprite {
     update() {
         this.time -= 1;
         if (this.time <= 0) {
-            this.delete_tag = true;
+            this.del();
         }
         else if (this.time < this.blink_time) {
             this.hide = this.time % 10 > 5;
@@ -44,7 +44,7 @@ class Item extends Sprite {
     }
 
     addEff(e){
-        this.delete_tag = true;
+        this.del();
         e.effect = this.effect;
     }
 }
@@ -73,7 +73,7 @@ class ItemManager {
     constructor() {
         this.entities = [];
         this.types = [Diamond, Apple];
-        this.weights = [6, 10];
+        this.weights = [6, 3];
         this.last_spawn_time = Date.now();
     }
 
@@ -82,8 +82,8 @@ class ItemManager {
     }
 
     randomPos() {
-        const maxr = 1000;
-        const minr = 200;
+        const maxr = 900;
+        const minr = 300;
         let pos, dist;
         do {
             pos = new Vec(Math.random() * maxr * 2 - maxr, Math.random() * maxr * 2 - maxr);
@@ -95,6 +95,7 @@ class ItemManager {
     spawn() {
         let type = this.randomType();
         let new_entity = new type({pos: this.randomPos()});
+        renderSystem.add(new_entity);
         this.entities.push(new_entity);
         return new_entity;
     }
@@ -104,15 +105,8 @@ class ItemManager {
             this.spawn();
             this.last_spawn_time = Date.now();
         }
-        for (let i = 0; i < this.entities.length; ++i) {
-            const entities = this.entities[i];
-            if (entities.delete_tag) {
-                this.entities.splice(i, 1);
-            }
-            else {
-                entities.update();
-            }
-        }
+        this.entities = delIfTagged(this.entities);
+        this.entities.forEach((i) => {i.update()});
     }
 }
 

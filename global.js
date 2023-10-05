@@ -1,6 +1,7 @@
 import {Vec, Rect, Sprite} from "./Sprite.js";
 import {images} from "./ImageLoader.js";
 import { Effect } from "./Item.js";
+import { renderSystem } from "./RenderSystem.js";
 
 let canvas;
 let ctx;
@@ -17,18 +18,19 @@ class Player extends Sprite {
             size: new Vec(100, 100),
             max_hp: 100,
             radius: 40,
-            effect: Effect.Null()
+            effect: Effect.Null(),
         })
         this.hp = this.max_hp;
     }
 
+    die() {
+        this.image = images.turtle_die;
+        this.dead = true;
+    }
+
     update() {
         if (this.hp <= 0) {
-            this.dead = true;
-        }
-
-        if (this.dead) {
-            this.image = images.turtle_die;
+            this.die();
             return;
         }
 
@@ -53,11 +55,10 @@ class Player extends Sprite {
         if (this.movable) {
             let mpos = mouseInput.pos;
             if (this.pos.dist(mpos) > 50) {
-                this.velTo(mpos, 3);
+                this.vel = Vec.pointsR(SIZE.div(2), mpos, 3);
             }
-            this.hflip = mpos.x > this.pos.x;
-            super.update();
-            this.vel = Vec.zero();
+            this.hflip = mpos.x > SIZE.x / 2;
+            this.move(this.vel);
         }
     }
 
@@ -76,46 +77,43 @@ class Player extends Sprite {
 
 class MouseInput {
     constructor(){
-        this.pos = Vec.zero();
-        this.mpos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
+        this.pos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
         document.addEventListener("mousemove", this.mouseMove.bind(this));
         document.addEventListener("touchmove", this.touchStart.bind(this), {passive: false});
         document.addEventListener("touchstart", this.touchMove.bind(this), {passive: false});
         document.addEventListener("touchend", this.touchEnd.bind(this), {passive: false});
     }
 
-    update() {
+    update(e) {
         let rect = canvas.getBoundingClientRect();
-        this.pos.x = (this.mpos.x - rect.left) * (canvas.width / rect.width);
-        this.pos.y = (this.mpos.y - rect.top) * (canvas.height / rect.height);
-        this.pos = this.pos.sub(SIZE.div(2)).add(player.pos);
+        this.pos.x = (e.clientX - rect.left) * canvas.width / rect.width;
+        this.pos.y = (e.clientY - rect.top) * canvas.height / rect.height;
     }
 
     mouseMove(event) {
-        this.mpos.x = event.clientX;
-        this.mpos.y = event.clientY;
+        this.update(event);
     }
 
     touchEnd(event) {
         player.noMove();
         event.cancelable && event.preventDefault();
+        this.update(event.touches[0]);
     }
 
     touchStart(event) {
         player.startMove();
         event.cancelable && event.preventDefault();
-        this.mpos.x = event.touches[0].clientX;
-        this.mpos.y = event.touches[0].clientY;
+        this.update(event.touches[0]);
     }
 
     touchMove(event) {
         event.cancelable && event.preventDefault();
-        this.mpos.x = event.touches[0].clientX;
-        this.mpos.y = event.touches[0].clientY;
+        this.update(event.touches[0]);
     }
 }
 
 let player = new Player();
+renderSystem.add(player);
 let mouseInput = new MouseInput();
 
 function resetDisplay() {

@@ -1,14 +1,15 @@
 import {Sprite, Vec} from "./Sprite.js";
 import {images} from "./ImageLoader.js"
 import {player, SIZE} from "./global.js";
-import { randomWeight} from "./utilities.js";
+import { delIfTagged, randomWeight } from "./utilities.js";
 import { ColCC, collisionSystem } from "./Collision.js";
+import { renderSystem } from "./RenderSystem.js";
+import { goundDecManager } from "./GoundDec.js";
 
 class Enemy extends Sprite {
     constructor(paras) {
         super({
             size: new Vec(100, 100),
-            dead: false,
             radius: 40
         });
         Object.assign(this, paras);
@@ -20,8 +21,6 @@ class Enemy extends Sprite {
         if (this.hp <= 0) {
             this.die();
         }
-        super.update();
-        this.vel = Vec.zero();
     }
 
     render(ctx) {
@@ -32,8 +31,7 @@ class Enemy extends Sprite {
     }
 
     die() {
-        this.col_event.del();
-        this.dead = true;
+        this.del();
     }
 
     attack(entity){
@@ -56,10 +54,12 @@ class Devil extends Enemy {
     }
 
     update() {
+        super.update();
+        this.vel = Vec.zero();
         if (this.pos.dist(player.pos) > 50) {
             this.velTo(player.pos, 2);
         }
-        super.update();
+        this.move(this.vel);
     }
 }
 
@@ -79,13 +79,15 @@ class Ghost extends Enemy {
     }
 
     update() {
+        super.update();
         this.phase += this.dphase;
+        this.vel = Vec.zero();
         if (this.pos.dist(player.pos) > 50) {
             this.velTo(player.pos, 3);
         }
         this.vel = this.vel.add(Vec.thetaR(this.phase, 7));
         this.hflip = this.vel.x > 0;
-        super.update();
+        this.move(this.vel);
     }
 }
 
@@ -115,6 +117,7 @@ class EnemyManager {
     spawn() {
         let type = this.randomType();
         let new_enemy = new type({pos: this.randomPos()});
+        renderSystem.add(new_enemy);
         this.enemies.push(new_enemy);
         return new_enemy;
     }
@@ -124,15 +127,8 @@ class EnemyManager {
             this.spawn();
             this.last_spawn_time = Date.now();
         }
-        for (let i = 0; i < this.enemies.length; ++i) {
-            const enemy = this.enemies[i];
-            if (enemy.dead) {
-                this.enemies.splice(i, 1);
-            }
-            else {
-                enemy.update();
-            }
-        }
+        this.enemies = delIfTagged(this.enemies);
+        this.enemies.forEach( (i) => {i.update()});
     }
 }
 
