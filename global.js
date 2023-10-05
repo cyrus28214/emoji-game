@@ -53,6 +53,7 @@ class MouseInput {
         this.pos = Vec.zero();
         this.mpos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
         document.addEventListener("mousemove", this.mouseMove.bind(this));
+        document.addEventListener("touchmove", this.touchMove.bind(this));
     }
 
     update() {
@@ -65,6 +66,11 @@ class MouseInput {
     mouseMove(event) {
         this.mpos.x = event.clientX;
         this.mpos.y = event.clientY;
+    }
+
+    touchMove(event) {
+        this.mpos.x = event.touches[0].clientX;
+        this.mpos.y = event.touches[0].clientY;
     }
 }
 

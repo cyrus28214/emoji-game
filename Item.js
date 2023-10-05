@@ -14,7 +14,7 @@ class Effect {
 
     constructor(paras) {
         Object.assign(this, {
-            time: 5000
+            time: 300
         }, paras);
     }
 }
@@ -23,9 +23,8 @@ class Item extends Sprite {
     constructor(paras) {
         super({
             delete_tag: false,
-            duration: 5000, 
-            blink_time: 4000,
-            spawn_time: Date.now(),
+            time: 300, 
+            blink_time: 60,
             size: new Vec(50, 50),
             radius: 25
         })
@@ -33,12 +32,12 @@ class Item extends Sprite {
     }
 
     update() {
-        const t = Date.now() - this.spawn_time;
-        if (t > this.duration) {
+        this.time -= 1;
+        if (this.time <= 0) {
             this.delete_tag = true;
         }
-        else if (t > this.blink_time) {
-            this.hide = t % 100 > 50;
+        else if (this.time < this.blink_time) {
+            this.hide = this.time % 10 > 5;
         }
     }
 
