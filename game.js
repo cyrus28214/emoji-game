@@ -1,10 +1,10 @@
 import {Vec} from "./Sprite.js";
-import {EnemyManager} from "./Enemy.js";
+import {enemyManager} from "./Enemy.js";
 import {ctx, SIZE, player, mouseInput} from "./global.js";
-import { GoundDecManager } from "./GoundDec.js";
+import { goundDecManager } from "./GoundDec.js";
 import { HpBar, ScoreBoard } from "./UI.js";
-import { ColManager, ColCC } from "./Collision.js";
-import { Effect, ItemManager } from "./Item.js";
+import { collisionSystem, ColCC } from "./Collision.js";
+import { itemManager } from "./Item.js";
 
 class RenderList {
     constructor() {
@@ -25,12 +25,8 @@ class RenderList {
     }
 }
 
-let enemyManager = new EnemyManager();
-let goundDecManager = new GoundDecManager();
 let renderList = new RenderList();
 let hpBar = new HpBar({entity: player});
-let colManager = new ColManager();
-let itemManager= new ItemManager();
 let scoreBoard = new ScoreBoard();
 
 let ii = false;
@@ -44,21 +40,7 @@ function gameLoop() {
 
     let colList = [];
 
-    for (const enemy of enemyManager.enemies) {
-        colList.push(new ColCC({
-            e1: player,
-            e2: enemy,
-            callback: () => {enemy.attack(player);}
-        }));
-    }
-    for (const item of itemManager.entities) {
-        colList.push(new ColCC({
-            e1: player,
-            e2: item,
-            callback: () => {item.addEff(player);}
-        }))
-    }
-    colManager.update(colList);
+    collisionSystem.update(colList);
 
     hpBar.update();
     if (!player.dead) scoreBoard.update();

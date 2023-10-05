@@ -5,7 +5,24 @@ function load(path) {
 }
 
 let images = {
-    // for i in devil turtle ghost heart tree seedling diamond turtle_diamond red_diamond turtle_die; do echo $i: "load(\"./images/$i.png\"),"; done;
+    /*
+    for i in\
+    devil \
+    turtle \
+    ghost\
+    heart\
+    tree\
+    seedling\
+    diamond\
+    turtle_diamond\
+    apple\
+    red_diamond\
+    turtle_die\
+    apple\
+    turtle_delicious\
+    heart_heal\
+    ; do echo $i: "load(\"./images/$i.png\"),"; done;
+    */
     devil: load("./images/devil.png"),
     turtle: load("./images/turtle.png"),
     ghost: load("./images/ghost.png"),
@@ -14,8 +31,12 @@ let images = {
     seedling: load("./images/seedling.png"),
     diamond: load("./images/diamond.png"),
     turtle_diamond: load("./images/turtle_diamond.png"),
+    apple: load("./images/apple.png"),
     red_diamond: load("./images/red_diamond.png"),
     turtle_die: load("./images/turtle_die.png"),
+    apple: load("./images/apple.png"),
+    turtle_delicious: load("./images/turtle_delicious.png"),
+    heart_heal: load("./images/heart_heal.png"),
 }
 
 

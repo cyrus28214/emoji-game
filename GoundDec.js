@@ -75,4 +75,6 @@ class GoundDecManager {
     }
 }
 
-export {GoundDecManager};
+let goundDecManager = new GoundDecManager();
+
+export {goundDecManager};

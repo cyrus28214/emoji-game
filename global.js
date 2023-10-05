@@ -38,11 +38,16 @@ class Player extends Sprite {
         else {
             this.effect.time -= 1;
         }
-        if (this.effect.type === "diamond") {
-            this.image = images.turtle_diamond;
-        }
-        else {
-            this.image = images.turtle;
+        
+        this.image = images[{
+            "null": "turtle",
+            "diamond": "turtle_diamond",
+            "heal": "turtle_delicious"
+        }[this.effect.type]];
+
+        if (this.effect.type === "heal") {
+            this.hp += 20 / 300;
+            this.hp = Math.min(this.hp, this.max_hp);
         }
 
         if (this.movable) {

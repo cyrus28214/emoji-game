@@ -2,6 +2,7 @@ import { Vec, Sprite } from "./Sprite.js";
 import { randomWeight } from "./utilities.js";
 import { player } from "./global.js";
 import { images } from "./ImageLoader.js";
+import { ColCC, collisionSystem } from "./Collision.js";
 
 //
 class Effect {
@@ -29,6 +30,7 @@ class Item extends Sprite {
             radius: 25
         })
         Object.assign(this, paras);
+        this.col_event = collisionSystem.add(ColCC, player, this, () => {this.addEff(player)});
     }
 
     update() {
@@ -57,11 +59,21 @@ class Diamond extends Item {
     }
 }
 
+class Apple extends Item {
+    constructor(paras) {
+        super({
+            image: images.apple,
+            effect: new Effect({type: "heal"})
+        })
+        Object.assign(this, paras);
+    }
+}
+
 class ItemManager {
     constructor() {
         this.entities = [];
-        this.types = [Diamond];
-        this.weights = [6];
+        this.types = [Diamond, Apple];
+        this.weights = [6, 10];
         this.last_spawn_time = Date.now();
     }
 
@@ -104,4 +116,6 @@ class ItemManager {
     }
 }
 
-export {ItemManager, Effect};
+const itemManager = new ItemManager();
+
+export {itemManager, Effect};

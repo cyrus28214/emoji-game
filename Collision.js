@@ -1,10 +1,12 @@
-class ColEvent {
+class CollisionEvent {
     constructor(paras) {
-        Object.assign(this, paras);
+        Object.assign(this, {
+            del_tag: false
+        }, paras);
     }
 }
 
-class ColCC extends ColEvent{
+class ColCC extends CollisionEvent{
     constructor(paras) {
         super(paras);
     }
@@ -14,21 +16,38 @@ class ColCC extends ColEvent{
             this.callback(this);
         }
     }
+
+    del() {
+        this.del_tag = true;
+    }
 }
 
-class ColManager {
+class CollisionSystem {
     constructor(paras) {
         Object.assign(this, {
-            events: [],
+            cols: [],
         }, paras);
     }
 
-    update(events) {
-        this.events = events;
-        for (const event of this.events) {
-            event.update();
+    add(type, e1, e2, callback) {
+        const col_event = new type({e1: e1, e2: e2, callback: callback}); 
+        this.cols.push(col_event);
+        return col_event;
+    }
+
+    update() {
+        for (let i = 0; i < this.cols.length; ++i) {
+            const event = this.cols[i];
+            if (event.del_tag) {
+                this.cols.splice(i, 1);
+            }
+            else {
+                event.update();
+            }
         }  
     }
 }
 
-export {ColEvent, ColCC, ColManager};
+const collisionSystem = new CollisionSystem();
+
+export {CollisionEvent as ColEvent, ColCC, collisionSystem};

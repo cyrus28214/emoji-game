@@ -2,6 +2,7 @@ import {Sprite, Vec} from "./Sprite.js";
 import {images} from "./ImageLoader.js"
 import {player, SIZE} from "./global.js";
 import { randomWeight} from "./utilities.js";
+import { ColCC, collisionSystem } from "./Collision.js";
 
 class Enemy extends Sprite {
     constructor(paras) {
@@ -11,6 +12,7 @@ class Enemy extends Sprite {
             radius: 40
         });
         Object.assign(this, paras);
+        this.col_event = collisionSystem.add(ColCC, player, this, () => {this.attack(player);});
     }
 
     update() {
@@ -24,12 +26,13 @@ class Enemy extends Sprite {
 
     render(ctx) {
         ctx.save();
-        ctx.globalAlpha = this.hp / this.max_hp * 0.7 + 0.3;
+        ctx.globalAlpha = this.hp / this.max_hp * 0.9 + 0.1;
         super.render(ctx);
         ctx.restore();
     }
 
     die() {
+        this.col_event.del();
         this.dead = true;
     }
 
@@ -133,4 +136,6 @@ class EnemyManager {
     }
 }
 
-export {Devil, Ghost, EnemyManager};
+let enemyManager = new EnemyManager();
+
+export {Devil, Ghost, enemyManager};
