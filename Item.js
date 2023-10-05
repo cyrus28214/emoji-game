@@ -3,7 +3,7 @@ import { randomWeight } from "./utilities.js";
 import { player } from "./global.js";
 import { images } from "./ImageLoader.js";
 
-
+//
 class Effect {
     static Null() {
         return new Effect({
