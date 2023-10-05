@@ -2,7 +2,7 @@ import {Vec} from "./Sprite.js";
 import {EnemyManager} from "./Enemy.js";
 import {ctx, SIZE, player, mouseInput} from "./global.js";
 import { GoundDecManager } from "./GoundDec.js";
-import { HpBar } from "./UI.js";
+import { HpBar, ScoreBoard } from "./UI.js";
 import { ColManager, ColCC } from "./Collision.js";
 import { Effect, ItemManager } from "./Item.js";
 
@@ -31,6 +31,9 @@ let renderList = new RenderList();
 let hpBar = new HpBar({entity: player});
 let colManager = new ColManager();
 let itemManager= new ItemManager();
+let scoreBoard = new ScoreBoard();
+
+let ii = false;
 
 function gameLoop() {
     mouseInput.update();
@@ -40,6 +43,7 @@ function gameLoop() {
     itemManager.update();
 
     let colList = [];
+
     for (const enemy of enemyManager.enemies) {
         colList.push(new ColCC({
             e1: player,
@@ -57,6 +61,8 @@ function gameLoop() {
     colManager.update(colList);
 
     hpBar.update();
+    if (!player.dead) scoreBoard.update();
+
     renderList.update(enemyManager.enemies.concat(goundDecManager.entities).concat(itemManager.entities).concat([player]));
 
     ctx.resetTransform();
@@ -69,6 +75,12 @@ function gameLoop() {
 
     ctx.resetTransform();
     hpBar.render(ctx);
+    scoreBoard.render(ctx);
+
+    if(!ii){
+        console.log(console.log(ctx));
+        ii = true;
+    }
     
     requestAnimationFrame(gameLoop);
 }
@@ -77,6 +89,7 @@ document.addEventListener("DOMContentLoaded", gameLoop);
 
 console.log(player);
 console.log(mouseInput);
+
 
 
 

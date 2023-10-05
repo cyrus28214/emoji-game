@@ -1,5 +1,6 @@
 import { images } from "./ImageLoader.js";
 import { Sprite, Vec } from "./Sprite.js";
+import { SIZE } from "./global.js";
 
 class Heart extends Sprite{
     constructor(paras) {
@@ -54,4 +55,29 @@ class HpBar{
     }
 }
 
-export {HpBar};
+class ScoreBoard {
+    constructor(paras) {
+        Object.assign(this, {
+            sc: 0,
+            pos: new Vec(SIZE.x - 50, 100)
+        }, paras);
+    }
+
+    update() {
+        this.sc += 1;
+    }
+
+    render(ctx) {
+        ctx.save();
+        const text = this.sc.toString();
+        ctx.fillStyle = "#FFF";
+        ctx.strokeStyle = "#000";
+        ctx.font = "64px sans-serif";
+        ctx.translate(this.pos.x - ctx.measureText(text).width, this.pos.y);
+        ctx.fillText(text, 0, 0);
+        ctx.strokeText(text, 0, 0);
+        ctx.restore();
+    }
+}
+
+export {HpBar, ScoreBoard};
