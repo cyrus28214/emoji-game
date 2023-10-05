@@ -53,7 +53,9 @@ class MouseInput {
         this.pos = Vec.zero();
         this.mpos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
         document.addEventListener("mousemove", this.mouseMove.bind(this));
-        document.addEventListener("touchmove", this.touchMove.bind(this));
+        document.addEventListener("touchmove", this.touchMove.bind(this), {passive: false});
+        document.addEventListener("touchstart", this.touchMove.bind(this), {passive: false});
+        document.addEventListener("touchend", this.touchEnd.bind(this), {passive: false});
     }
 
     update() {
@@ -68,7 +70,13 @@ class MouseInput {
         this.mpos.y = event.clientY;
     }
 
+    touchEnd() {
+        e.cancelable && e.preventDefault();
+        this.mpos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
+    }
+
     touchMove(event) {
+        e.cancelable && e.preventDefault();
         this.mpos.x = event.touches[0].clientX;
         this.mpos.y = event.touches[0].clientY;
     }
