@@ -11,6 +11,7 @@ const RECT = new Rect(new Vec(0, 0), SIZE);
 class Player extends Sprite {
     constructor() {
         super({
+            follow: true,
             image: images.turtle,
             pos: new Vec(0, 0),
             size: new Vec(100, 100),
@@ -34,13 +35,16 @@ class Player extends Sprite {
         else {
             this.image = images.turtle;
         }
-        let mpos = mouseInput.pos;
-        if (this.pos.dist(mpos) > 50) {
-            this.velTo(mpos, 3);
+
+        if (this.follow) {
+            let mpos = mouseInput.pos;
+            if (this.pos.dist(mpos) > 50) {
+                this.velTo(mpos, 3);
+            }
+            this.hflip = mpos.x > this.pos.x;
+            super.update();
+            this.vel = Vec.zero();
         }
-        this.hflip = mpos.x > this.pos.x;
-        super.update();
-        this.vel = Vec.zero();
     }
 
     render() {
@@ -53,7 +57,7 @@ class MouseInput {
         this.pos = Vec.zero();
         this.mpos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
         document.addEventListener("mousemove", this.mouseMove.bind(this));
-        document.addEventListener("touchmove", this.touchMove.bind(this), {passive: false});
+        document.addEventListener("touchmove", this.touchStart.bind(this), {passive: false});
         document.addEventListener("touchstart", this.touchMove.bind(this), {passive: false});
         document.addEventListener("touchend", this.touchEnd.bind(this), {passive: false});
     }
@@ -70,13 +74,21 @@ class MouseInput {
         this.mpos.y = event.clientY;
     }
 
-    touchEnd() {
-        e.cancelable && e.preventDefault();
-        this.mpos = new Vec(document.innerWidth / 2, document.innerWidth / 2);
+    touchEnd(event) {
+        player.follow = false;
+        event.cancelable && event.preventDefault();
+        this.mpos = new Vec(window.innerWidth / 2 - 100, window.innerHeight / 2);
+    }
+
+    touchStart(event) {
+        player.follow = true;
+        event.cancelable && event.preventDefault();
+        this.mpos.x = event.touches[0].clientX;
+        this.mpos.y = event.touches[0].clientY;
     }
 
     touchMove(event) {
-        e.cancelable && e.preventDefault();
+        event.cancelable && event.preventDefault();
         this.mpos.x = event.touches[0].clientX;
         this.mpos.y = event.touches[0].clientY;
     }
