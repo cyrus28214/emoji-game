@@ -1,53 +1,10 @@
 import {Vec} from "./Sprite.js";
-import {randomWeight} from "./utilities.js";
-import {Devil, Ghost} from "./Enemy.js";
+import {EnemyManager} from "./Enemy.js";
 import {ctx, SIZE, player, mouseInput} from "./global.js";
 import { GoundDecManager } from "./GoundDec.js";
-
-class EnemyManager {
-    constructor() {
-        this.enemies = [];
-        this.enemyTypes = [Devil, Ghost];
-        this.weights = [6, 4];
-        this.last_spawn_time = Date.now();
-    }
-
-    randomType() {
-        return this.enemyTypes[randomWeight(this.weights)];
-    }
-
-    randomPos() {
-        let pos;
-        do {
-            pos = new Vec(Math.random() * SIZE.x, Math.random() * SIZE.y);
-        } while(pos.dist(player.pos) <= 400);
-        return pos;
-    }
-
-    spawn() {
-        let type = this.randomType();
-        let pos = this.randomPos();
-        let new_enemy = new type(pos);
-        this.enemies.push(new_enemy);
-        return new_enemy;
-    }
-
-    update() {
-        if (Date.now() - this.last_spawn_time > 1000) {
-            this.spawn();
-            this.last_spawn_time = Date.now();
-        }
-        for (let i = 0; i < this.enemies.length; ++i) {
-            const enemy = this.enemies[i];
-            if (enemy.dead) {
-                this.enemies.splice(i, 1);
-            }
-            else {
-                enemy.update();
-            }
-        }
-    }
-}
+import { HpBar } from "./UI.js";
+import { ColManager, ColCC } from "./Collision.js";
+import { Effect, ItemManager } from "./Item.js";
 
 class RenderList {
     constructor() {
@@ -71,20 +28,47 @@ class RenderList {
 let enemyManager = new EnemyManager();
 let goundDecManager = new GoundDecManager();
 let renderList = new RenderList();
-
+let hpBar = new HpBar({entity: player});
+let colManager = new ColManager();
+let itemManager= new ItemManager();
 
 function gameLoop() {
     mouseInput.update();
-    enemyManager.update();
     goundDecManager.update();
     player.update();
-    renderList.update(enemyManager.enemies.concat(goundDecManager.entities).concat([player]));
+    enemyManager.update();
+    itemManager.update();
+
+    let colList = [];
+    for (const enemy of enemyManager.enemies) {
+        colList.push(new ColCC({
+            e1: player,
+            e2: enemy,
+            callback: () => {enemy.attack(player);}
+        }));
+    }
+    for (const item of itemManager.entities) {
+        colList.push(new ColCC({
+            e1: player,
+            e2: item,
+            callback: () => {item.addEff(player);}
+        }))
+    }
+    colManager.update(colList);
+
+    hpBar.update();
+    renderList.update(enemyManager.enemies.concat(goundDecManager.entities).concat(itemManager.entities).concat([player]));
 
     ctx.resetTransform();
     ctx.clearRect(0, 0, ...SIZE.arr());
+
+
     ctx.translate(...player.pos.oppo().add(SIZE.div(2)).arr());
 
     renderList.render();
+
+    ctx.resetTransform();
+    hpBar.render(ctx);
     
     requestAnimationFrame(gameLoop);
 }

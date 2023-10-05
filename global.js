@@ -1,5 +1,6 @@
 import {Vec, Rect, Sprite} from "./Sprite.js";
-import {images} from "./ImageLoader.js"
+import {images} from "./ImageLoader.js";
+import { Effect } from "./Item.js";
 
 let canvas;
 let ctx;
@@ -9,12 +10,30 @@ const RECT = new Rect(new Vec(0, 0), SIZE);
 
 class Player extends Sprite {
     constructor() {
-        super(images.turtle, new Vec(0, 0), new Vec(100, 100));
-        this.max_hp = 100;
+        super({
+            image: images.turtle,
+            pos: new Vec(0, 0),
+            size: new Vec(100, 100),
+            max_hp: 100,
+            radius: 40,
+            effect: Effect.Null()
+        })
         this.hp = this.max_hp;
     }
 
     update() {
+        if (this.effect.time === 0) {
+            this.effect = Effect.Null();
+        }
+        else {
+            this.effect.time -= 1;
+        }
+        if (this.effect.type === "diamond") {
+            this.image = images.turtle_diamond;
+        }
+        else {
+            this.image = images.turtle;
+        }
         let mpos = mouseInput.pos;
         if (this.pos.dist(mpos) > 50) {
             this.velTo(mpos, 3);

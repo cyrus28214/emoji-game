@@ -73,11 +73,10 @@ class Vec {
     }
 }
 
-class Rect {
-    constructor(pos, size, pivot) {
-        this.pos = pos;
-        this.size = size;
-        this.pivot = pivot || new Vec(0, 0);
+class Rect{
+    constructor(paras) {
+        this.pivot = Vec.zero();
+        Object.assign(this, paras);
     }
 
     left() {
@@ -102,11 +101,14 @@ class Rect {
 }
 
 class Sprite extends Rect{
-    constructor(img, pos, size, pivot) {
-        super(pos, size, pivot || new Vec(0.5, 0.5));
-        this.image = img;
-        this.hflip = false;
-        this.vel = new Vec(0, 0);
+    constructor(paras) {
+        super({
+            hide: false,
+            hflip: false,
+            vel: Vec.zero(),
+            pivot: new Vec(0.5, 1)
+        });
+        Object.assign(this, paras);
     }
 
     velTo(targetPos, step) {
@@ -118,7 +120,7 @@ class Sprite extends Rect{
     }
 
     render(ctx) {
-        if (!this.image.complete) return;
+        if (!this.image.complete || this.hide) return;
         ctx.save();
         ctx.translate(this.pos.x, this.pos.y);
         if (this.hflip) {

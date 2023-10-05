@@ -4,21 +4,30 @@ import {SIZE, player} from "./global.js";
 import {randomWeight, doTimes} from "./utilities.js";
 
 class GroudDec extends Sprite {
-    constructor(img, pos, size) {
-        super(img, pos, size);
+    constructor(paras) {
+        super();
+        Object.assign(this, paras);
     }
 }
 
 class Tree extends GroudDec {
-    constructor(pos) {
-        super(images.tree, pos, new Vec(200, 200));
+    constructor(paras) {
+        super({
+            image: images.tree,
+            size: new Vec(200, 200)
+        });
+        Object.assign(this, paras);
     }
 }
 
 class Seedling extends GroudDec {
-    constructor(pos) {
-        super(images.seedling, pos, new Vec(50, 50));
-        this.hflip = Math.random() < 0.5;
+    constructor(paras) {
+        super({
+            image: images.seedling,
+            size: new Vec(50, 50),
+            hflip: Math.random() < 0.5
+        });
+        Object.assign(this, paras);
     }
 }
 
@@ -44,9 +53,10 @@ class GoundDecManager {
     }
 
     spawn(){
-        let pos = this.randomPos();
         let type = this.randomType();
-        let new_dec = new type(pos);
+        let new_dec = new type({
+            pos: this.randomPos()
+        });
         this.entities.push(new_dec);
         return new_dec;
     }
