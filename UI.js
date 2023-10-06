@@ -29,7 +29,7 @@ class HpBar{
 
     update() {
         this.heart.image = images[{
-            "diamond":"diamond",
+            "diamond":"red_diamond",
             "heal":"heart_heal",
             "devil":"purple_heart",
         }[this.entity.effect.type]];
