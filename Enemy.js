@@ -118,8 +118,8 @@ export class Robot extends Enemy {
         let dx = Math.abs(this.pos.x - player.pos.x);
         let dy = Math.abs(this.pos.y - player.pos.y);
         this.tar = Math.random() > 0.5 ? 
-            new Vec(player.pos.x + Math.random() * 400 - 800, this.pos.y) :
-            new Vec(this.pos.x, player.pos.y + Math.random() * 400 - 800);
+            new Vec(player.pos.x + Math.random() * 800 - 400, this.pos.y) :
+            new Vec(this.pos.x, player.pos.y + Math.random() * 800 - 400);
     }
 
     update() {
