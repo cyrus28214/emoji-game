@@ -1,7 +1,7 @@
 import {Sprite, Vec} from "./Sprite.js";
 import {images} from "./ImageLoader.js"
-import {player, SIZE} from "./global.js";
-import { delIfTagged, randomWeight } from "./utilities.js";
+import {player, SIZE, totalTick} from "./global.js";
+import { delIfTagged, getLerp, getLiner, randomWeight } from "./utilities.js";
 import { ColCC, collisionSystem } from "./Collision.js";
 import { renderSystem } from "./RenderSystem.js";
 import { goundDecManager } from "./GoundDec.js";
@@ -91,15 +91,58 @@ class Ghost extends Enemy {
     }
 }
 
+class Robot extends Enemy {
+    constructor(paras) {
+        super({
+            image: images.robot,
+            max_hp: 300,
+            self_dmg: 0.3,
+            dmg: 21,
+        });
+        this.hp = this.max_hp;
+        this.tar = null;
+        Object.assign(this, paras);
+    }
+
+    getNextTar() {
+        let dx = Math.abs(this.pos.x - player.pos.x);
+        let dy = Math.abs(this.pos.y - player.pos.y);
+        this.tar = dx > dy ? new Vec(player.pos.x, this.pos.y) : new Vec(this.pos.x, player.pos.y);
+    }
+
+    update() {
+        if (this.tar === null ||
+            this.pos.dist(this.tar) < 10) {
+                this.getNextTar();
+        }
+        super.update();
+        this.vel = Vec.zero();
+        this.velTo(this.tar, 3);
+        this.move(this.vel);
+    }
+}
+
 class EnemyManager {
     constructor() {
         this.enemies = [];
-        this.enemyTypes = [Devil, Ghost];
-        this.weights = [6, 4];
-        this.last_spawn_time = Date.now();
+        this.enemyTypes = [Devil, Robot, Ghost];
+        this.getWeights = [
+            () => { return 10; },
+            getLerp(0, 0, 1000, 10),
+            getLerp(1000, 0, 2000, 10),
+        ];
+        this.weights = [];
+        this.time = 0;
+    }
+
+    liner = getLiner(0.01, 10)
+
+    nextSpawnTime() {
+        return Math.floor(1000 / this.liner(totalTick));
     }
 
     randomType() {
+        console.log(randomWeight(this.weights));
         return this.enemyTypes[randomWeight(this.weights)];
     }
 
@@ -123,10 +166,12 @@ class EnemyManager {
     }
 
     update() {
-        if (Date.now() - this.last_spawn_time > 1000) {
+        this.weights = this.getWeights.map(f => { return f(totalTick); });
+        if (this.time === 0) {
             this.spawn();
-            this.last_spawn_time = Date.now();
+            this.time = this.nextSpawnTime();
         }
+        this.time -= 1;
         this.enemies = delIfTagged(this.enemies);
         this.enemies.forEach( (i) => {i.update()});
     }

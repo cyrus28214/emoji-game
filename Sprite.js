@@ -64,6 +64,7 @@ class Vec {
     }
 
     in(rect) {
+        
         return this.x >= rect.left() &&
             this.x <= rect.right() &&
             this.y >= rect.top() &&

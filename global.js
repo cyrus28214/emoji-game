@@ -1,10 +1,15 @@
-import {Vec, Rect, Sprite} from "./Sprite.js";
+import { Vec, Rect, Sprite } from "./Sprite.js";
 import {images} from "./ImageLoader.js";
 import { Effect } from "./Item.js";
 import { renderSystem } from "./RenderSystem.js";
 
 let canvas;
 let ctx;
+export let totalTick = 0;
+
+export function increTick(){
+    totalTick += 1;
+}
 
 const SIZE = new Vec(900, 1600);
 const RECT = new Rect(new Vec(0, 0), SIZE);
@@ -97,7 +102,6 @@ class MouseInput {
     touchEnd(event) {
         player.noMove();
         event.cancelable && event.preventDefault();
-        this.update(event.touches[0]);
     }
 
     touchStart(event) {

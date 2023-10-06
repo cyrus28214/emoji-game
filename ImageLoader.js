@@ -22,6 +22,7 @@ let images = {
     turtle_delicious\
     heart_heal\
     tick\
+    robot\
     ; do echo $i: "load(\"./images/$i.png\"),"; done;
     */
     devil: load("./images/devil.png"),
@@ -39,6 +40,7 @@ let images = {
     turtle_delicious: load("./images/turtle_delicious.png"),
     heart_heal: load("./images/heart_heal.png"),
     tick: load("./images/tick.png"),
+    robot: load("./images/robot.png"),
 }
 
 

@@ -1,6 +1,6 @@
 import { images } from "./ImageLoader.js";
 import { Sprite, Vec } from "./Sprite.js";
-import { SIZE, mouseInput, player } from "./global.js";
+import { SIZE, mouseInput, player, totalTick } from "./global.js";
 
 class Heart extends Sprite{
     constructor(paras) {
@@ -63,7 +63,7 @@ class ScoreBoard {
     }
 
     update() {
-        this.sc += 1;
+        this.sc = totalTick;
     }
 
     render(ctx) {

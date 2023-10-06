@@ -1,6 +1,6 @@
 import {Vec} from "./Sprite.js";
 import {enemyManager} from "./Enemy.js";
-import {ctx, SIZE, player, mouseInput} from "./global.js";
+import {ctx, SIZE, player, mouseInput, totalTick, increTick} from "./global.js";
 import { goundDecManager, tree_list } from "./GoundDec.js";
 import { collisionSystem, ColCC } from "./Collision.js";
 import { itemManager } from "./Item.js";
@@ -44,6 +44,7 @@ function gameLoop() {
         ii = true;
     }
     
+    increTick();
     requestAnimationFrame(gameLoop);
 }
 
