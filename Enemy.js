@@ -154,7 +154,7 @@ export class Alien extends Enemy {
         this.rotate = 360 * 3 * this.rest / this.rest_time;
         if (this.rest > 0) {
             if (--this.rest === 0) {
-                this.tar = player.pos.add(Vec.pointsR(this.pos, player.pos, 100));
+                this.tar = player.pos.add(Vec.pointsR(this.pos, player.pos, 200));
             }
             return;
         }
