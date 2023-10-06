@@ -10,7 +10,7 @@ class Enemy extends Sprite {
     constructor(paras) {
         super({
             size: new Vec(100, 100),
-            radius: 40
+            radius: 30
         });
         Object.assign(this, paras);
         this.col_event = collisionSystem.add(ColCC, player, this, () => {this.attack(player);});
@@ -122,14 +122,72 @@ class Robot extends Enemy {
     }
 }
 
+class Alien extends Enemy {
+    constructor(paras) {
+        super({
+            image: images.alien,
+            max_hp: 200,
+            self_dmg: 0.3,
+            dmg: 19,
+        });
+        this.hp = this.max_hp;
+        this.tar = null;
+        this.rest_time = 120;
+        this.rest = this.rest_time;
+        Object.assign(this, paras);
+    }
+
+    update() {
+        super.update();
+        this.rotate = 360 * 3 * this.rest / this.rest_time;
+        if (this.rest > 0) {
+            if (--this.rest === 0) {
+                this.tar = player.pos.add(Vec.pointsR(this.pos, player.pos, 100));
+            }
+            return;
+        }
+        this.velTo(this.tar, 0.5);
+        if (
+            this.pos.dist(this.tar) < this.vel.len()) {
+                this.vel = Vec.zero();
+                this.rest = this.rest_time;
+        }
+        this.move(this.vel);
+    }
+}
+
+class RedDevil extends Enemy {
+    constructor(paras) {
+        super({
+            image: images.red_devil,
+            max_hp: 500,
+            self_dmg: 0.3,
+            dmg: 48,
+        });
+        this.hp = this.max_hp;
+        Object.assign(this, paras);
+    }
+
+    update() {
+        super.update();
+        this.vel = Vec.zero();
+        if (this.pos.dist(player.pos) > 50) {
+            this.velTo(player.pos, 3);
+        }
+        this.move(this.vel);
+    }
+}
+
 class EnemyManager {
     constructor() {
         this.enemies = [];
-        this.enemyTypes = [Devil, Robot, Ghost];
+        this.enemyTypes = [Devil, Robot, Ghost, Alien, RedDevil];
         this.getWeights = [
             () => { return 10; },
-            getLerp(0, 0, 1000, 10),
             getLerp(1000, 0, 2000, 10),
+            getLerp(2000, 0, 3000, 10),
+            getLerp(3000, 0, 4000, 5),
+            getLerp(4000, 0, 5000, 3),
         ];
         this.weights = [];
         this.time = 0;
@@ -142,7 +200,6 @@ class EnemyManager {
     }
 
     randomType() {
-        console.log(randomWeight(this.weights));
         return this.enemyTypes[randomWeight(this.weights)];
     }
 

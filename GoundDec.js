@@ -23,6 +23,7 @@ class Tree extends GroudDec {
             image: images.tree,
             size: new Vec(200, 200),
             radius: 20,
+            pivot: new Vec(0.5, 0.8)
         });
         Object.assign(this, paras);
         tree_list.push(this);

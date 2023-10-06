@@ -109,8 +109,9 @@ class Sprite extends Rect{
             hide: false,
             hflip: false,
             vel: Vec.zero(),
-            pivot: new Vec(0.5, 1),
-            del_tag: false
+            pivot: new Vec(0.5, 0.5),
+            del_tag: false,
+            rotate: 0,
         });
         Object.assign(this, paras);
     }
@@ -127,9 +128,16 @@ class Sprite extends Rect{
         if (!this.image.complete || this.hide) return;
         ctx.save();
         ctx.translate(this.pos.x, this.pos.y);
-        if (this.hflip) {
-            ctx.scale(-1, 1);
+
+        if (this.rotate !== 0) {
+            ctx.setTransform(
+                ctx.getTransform().multiply(
+                    new DOMMatrix().rotateSelf(this.rotate)
+                )
+            );
         }
+        if (this.hflip) ctx.scale(-1, 1);
+
         ctx.drawImage(this.image, -this.size.x * this.pivot.x, -this.size.y * this.pivot.y, ...this.size.arr());
         ctx.restore();
     }

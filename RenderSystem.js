@@ -14,7 +14,7 @@ class RenderSystem {
     }
 
     render(ctx) {
-        this.entities.sort((a, b) => {return a.pos.y - b.pos.y});
+        this.entities.sort((a, b) => {return a.bottom() - b.bottom()});
         this.entities.forEach((i) => {i.render(ctx)});
     }
 }
