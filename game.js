@@ -20,6 +20,7 @@ function gameLoop() {
     if (!player.dead) itemManager.update();
     collisionSystem.update();
     collisionSystem.repel(tree_list, enemyManager.enemies.concat([player]));
+    if (player.effect.type === "devil") collisionSystem.devil_kill(enemyManager.enemies);
 
     hpBar.update();
     if (player.dead) restartButton.update();

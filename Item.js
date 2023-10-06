@@ -24,7 +24,7 @@ class Effect {
 class Item extends Sprite {
     constructor(paras) {
         super({
-            time: 300, 
+            time: 360, 
             blink_time: 60,
             size: new Vec(50, 50),
             radius: 25
@@ -69,12 +69,22 @@ class Apple extends Item {
     }
 }
 
+class PurpleHeart extends Item {
+    constructor(paras) {
+        super({
+            image: images.purple_heart_rect,
+            effect: new Effect({type: "devil", time: 1200})
+        })
+        Object.assign(this, paras);
+    }
+}
+
 class ItemManager {
     constructor() {
         this.entities = [];
-        this.types = [Diamond, Apple];
-        this.weights = [6, 3];
-        this.last_spawn_time = Date.now();
+        this.types = [Diamond, Apple, PurpleHeart];
+        this.weights = [6, 3, 1];
+        this.time = 120;
     }
 
     randomType() {
@@ -82,7 +92,7 @@ class ItemManager {
     }
 
     randomPos() {
-        const maxr = 900;
+        const maxr = 800;
         const minr = 300;
         let pos, dist;
         do {
@@ -101,9 +111,10 @@ class ItemManager {
     }
 
     update() {
-        if (Date.now() - this.last_spawn_time > 2000) {
+        --this.time;
+        if (this.time === 0) {
             this.spawn();
-            this.last_spawn_time = Date.now();
+            this.time = 120;
         }
         this.entities = delIfTagged(this.entities);
         this.entities.forEach((i) => {i.update()});

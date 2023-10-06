@@ -29,10 +29,12 @@ class HpBar{
 
     update() {
         this.heart.image = images[{
-            "null":"heart",
             "diamond":"red_diamond",
-            "heal":"heart_heal"
+            "heal":"heart_heal",
+            "devil":"purple_heart",
         }[this.entity.effect.type]];
+        if (this.heart.image === undefined)
+            this.heart.image = images.heart;
         this.heartcnt = this.entity.hp / this.entity.max_hp * this.max_heart;
         this.full = Math.floor(this.heartcnt);
         this.last_opacity = this.heartcnt % 1;

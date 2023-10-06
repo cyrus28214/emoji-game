@@ -29,6 +29,7 @@ class Player extends Sprite {
     }
 
     die() {
+        this.effect = Effect.Null();
         this.image = images.turtle_die;
         this.dead = true;
     }
@@ -49,7 +50,8 @@ class Player extends Sprite {
         this.image = images[{
             "null": "turtle",
             "diamond": "turtle_diamond",
-            "heal": "turtle_delicious"
+            "heal": "turtle_delicious",
+            "devil": "turtle_devil"
         }[this.effect.type]];
 
         if (this.effect.type === "heal") {

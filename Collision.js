@@ -1,3 +1,4 @@
+import { Devil, RedDevil } from "./Enemy.js";
 import { Vec } from "./Sprite.js";
 
 class CollisionEvent {
@@ -17,8 +18,12 @@ class ColCC extends CollisionEvent{
         super(paras);
     }
 
+    test() {
+        return this.e1.pos.dist(this.e2.pos) <= this.e1.radius + this.e2.radius;
+    }
+
     update() {
-        if (this.e1.pos.dist(this.e2.pos) <= this.e1.radius + this.e2.radius) {
+        if (this.test()) {
             this.callback(this);
         }
     }
@@ -49,6 +54,23 @@ class CollisionSystem {
                     e.pos = tree.pos.add(Vec.pointsR(tree.pos, e.pos, tree.radius + e.radius));
                 }
             }
+        }
+    }
+
+    devil_kill(enemies) {
+        let devils = enemies.filter(i => { return i instanceof Devil || i instanceof RedDevil; });
+        let others = enemies.filter(i => { return !(i instanceof Devil || i instanceof RedDevil); });
+        if (others.length === 0) return;
+        for (const i of devils) {
+            let d = others.map(j => { return i.pos.dist(j.pos); });
+            let j = 0;
+            for (let k = 1; k < others.length; ++k)
+                if (d[k] < d[j]) j = k;
+            for (let k = 0; k < others.length; ++k)
+                if (d[k] < i.radius + others[k].radius){
+                    others[k].hp -= i.dmg;
+                }
+            if (d[j] < 400) i.move(Vec.pointsR(i.pos, others[j].pos, i.speed * 1.5));
         }
     }
 }

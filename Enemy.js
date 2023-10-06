@@ -35,19 +35,24 @@ class Enemy extends Sprite {
     }
 
     attack(entity){
-        if (entity.effect.type === "diamond" || entity.dead) return;
+        if (entity === player) {
+            if (entity.effect.type === "diamond" || entity.dead) return;
+            if (entity.effect.type === "devil" && (this instanceof Devil || this instanceof RedDevil)) return;
+        }
+        
         entity.hp -= this.dmg;
         this.die();
     }
 }
 
-class Devil extends Enemy {
+export class Devil extends Enemy {
     constructor(paras) {
         super({
             image: images.devil,
             max_hp: 200,
             self_dmg: 0.3,
             dmg: 27,
+            speed: 2,
         });
         this.hp = this.max_hp;
         Object.assign(this, paras);
@@ -56,14 +61,19 @@ class Devil extends Enemy {
     update() {
         super.update();
         this.vel = Vec.zero();
-        if (this.pos.dist(player.pos) > 50) {
-            this.velTo(player.pos, 2);
+        const drt = Vec.pointsR(this.pos, player.pos, this.speed);
+        const dist = this.pos.dist(player.pos);
+        if (player.effect.type === "devil") {
+            if (dist < 200) this.vel = drt.oppo();
+        }
+        else if (dist > 50) {
+            this.vel = drt;
         }
         this.move(this.vel);
     }
 }
 
-class Ghost extends Enemy {
+export class Ghost extends Enemy {
     constructor(paras) {
         super({
             image: images.ghost,
@@ -91,7 +101,7 @@ class Ghost extends Enemy {
     }
 }
 
-class Robot extends Enemy {
+export class Robot extends Enemy {
     constructor(paras) {
         super({
             image: images.robot,
@@ -124,7 +134,7 @@ class Robot extends Enemy {
     }
 }
 
-class Alien extends Enemy {
+export class Alien extends Enemy {
     constructor(paras) {
         super({
             image: images.alien,
@@ -158,13 +168,14 @@ class Alien extends Enemy {
     }
 }
 
-class RedDevil extends Enemy {
+export class RedDevil extends Enemy {
     constructor(paras) {
         super({
             image: images.red_devil,
             max_hp: 500,
             self_dmg: 0.3,
             dmg: 48,
+            speed: 3,
         });
         this.hp = this.max_hp;
         Object.assign(this, paras);
@@ -173,23 +184,28 @@ class RedDevil extends Enemy {
     update() {
         super.update();
         this.vel = Vec.zero();
-        if (this.pos.dist(player.pos) > 50) {
-            this.velTo(player.pos, 3);
+        const drt = Vec.pointsR(this.pos, player.pos, this.speed);
+        const dist = this.pos.dist(player.pos);
+        if (player.effect.type === "devil") {
+            if (dist < 200) this.vel = drt.oppo();
+        }
+        else if (dist > 50) {
+            this.vel = drt;
         }
         this.move(this.vel);
     }
 }
 
-class EnemyManager {
+export class EnemyManager {
     constructor() {
         this.enemies = [];
         this.enemyTypes = [Devil, Robot, Ghost, Alien, RedDevil];
         this.getWeights = [
             () => { return 10; },
-            getLerp(1000, 0, 2000, 10),
-            getLerp(2000, 0, 3000, 10),
-            getLerp(3000, 0, 4000, 5),
-            getLerp(4000, 0, 5000, 3),
+            getLerp(1000, 0, 3000, 10),
+            getLerp(2000, 0, 4000, 10),
+            getLerp(3000, 0, 5000, 5),
+            getLerp(4000, 0, 6000, 3),
         ];
         this.weights = [];
         this.time = 0;
@@ -207,7 +223,7 @@ class EnemyManager {
 
     randomPos() {
         const maxr = 600;
-        const minr = 300;
+        const minr = 400;
         let pos, dist;
         do {
             pos = new Vec(Math.random() * maxr *2 - maxr, Math.random() * maxr * 2 - maxr);
@@ -236,6 +252,4 @@ class EnemyManager {
     }
 }
 
-let enemyManager = new EnemyManager();
-
-export {Devil, Ghost, enemyManager};
+export let enemyManager = new EnemyManager();
